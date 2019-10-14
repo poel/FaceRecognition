@@ -19,6 +19,7 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.blankj.utilcode.util.ScreenUtils
 import java.io.File
 
 // This is an arbitrary number we are using to keep tab of the permission
@@ -63,6 +64,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
         val previewConfig = PreviewConfig.Builder().apply {
             setTargetAspectRatio(Rational(1, 1))
             setTargetResolution(Size(640, 640))
+            setLensFacing(CameraX.LensFacing.FRONT)
         }.build()
 
         // Build the viewfinder use case
@@ -88,6 +90,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
                     // select a capture mode which will infer the appropriate
                     // resolution based on aspect ration and requested mode
                     setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+                    setLensFacing(CameraX.LensFacing.FRONT)
                 }.build()
 
         // Build the image capture use case and attach button click listener
@@ -123,6 +126,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
             // analyzing *every* image
             setImageReaderMode(
                     ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+            setLensFacing(CameraX.LensFacing.FRONT)
         }.build()
 
         // Build the image analysis use case and instantiate our analyzer
