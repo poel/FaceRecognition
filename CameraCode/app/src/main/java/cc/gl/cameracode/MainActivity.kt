@@ -20,6 +20,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import cc.gl.cameracode.util.Base64Util
+import com.blankj.utilcode.util.LogUtils
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.*
 
@@ -115,23 +117,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                             Log.d("CameraXApp", msg)
 
-                            val size = file.length().toInt()
-                            val bytes = ByteArray(size)
-                            try {
-                                val buf = BufferedInputStream(FileInputStream(file))
-                                buf.read(bytes, 0, bytes.size)
-
-                                Schedulers.io().scheduleDirect{
-                                    FaceDetect.detect(Base64Util.encode(bytes))
-                                }
-
-                                buf.close()
-                            } catch (e: FileNotFoundException) {
-                                e.printStackTrace()
-                            } catch (e: IOException) {
-                                e.printStackTrace()
-                            }
-
+                            detectFace(file)
                         }
                     })
         }
@@ -206,5 +192,32 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun detectFace(file: File) {
+
+        val size = file.length().toInt()
+        val bytes = ByteArray(size)
+        try {
+            val buf = BufferedInputStream(FileInputStream(file))
+            buf.read(bytes, 0, bytes.size)
+
+            val disposable = FaceDetect.detect(Base64Util.encode(bytes))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { t ->
+                    if(Constants.RX_ERROR == t) {
+                        LogUtils.eTag(Constants.TAG, t)
+                    }else {
+                        LogUtils.eTag(Constants.TAG, t)
+                    }
+                }
+
+            buf.close()
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 }

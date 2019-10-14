@@ -8,4 +8,6 @@ object Constants {
     val RX_ERROR: String = "RX_ERROR"
 
     var AIP_ACCESS_TOKEN: String? = null
+
+    val TAG = "face_aip"
  }
