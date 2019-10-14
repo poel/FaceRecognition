@@ -19,8 +19,10 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.blankj.utilcode.util.ScreenUtils
-import java.io.File
+import cc.gl.cameracode.util.Base64Util
+import io.reactivex.schedulers.Schedulers
+import java.io.*
+
 
 // This is an arbitrary number we are using to keep tab of the permission
 // request. Where an app has multiple context for requesting permission,
@@ -112,6 +114,24 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
                             val msg = "Photo capture succeeded: ${file.absolutePath}"
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                             Log.d("CameraXApp", msg)
+
+                            val size = file.length().toInt()
+                            val bytes = ByteArray(size)
+                            try {
+                                val buf = BufferedInputStream(FileInputStream(file))
+                                buf.read(bytes, 0, bytes.size)
+
+                                Schedulers.io().scheduleDirect{
+                                    FaceDetect.detect(Base64Util.encode(bytes))
+                                }
+
+                                buf.close()
+                            } catch (e: FileNotFoundException) {
+                                e.printStackTrace()
+                            } catch (e: IOException) {
+                                e.printStackTrace()
+                            }
+
                         }
                     })
         }
