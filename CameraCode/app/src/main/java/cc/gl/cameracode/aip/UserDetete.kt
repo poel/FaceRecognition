@@ -1,15 +1,13 @@
-package cc.gl.cameracode
+package cc.gl.cameracode.aip
 
+import cc.gl.cameracode.Constants
+import cc.gl.cameracode.util.GsonUtils
 import cc.gl.cameracode.util.HttpUtil
-import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import io.reactivex.Observable
+import kotlin.collections.HashMap
 
-/**
- * 人脸检测与属性分析
- */
-object FaceDetect {
-
+object UserDetete {
     /**
      * 重要提示代码中所需工具类
      * FileUtil,Base64Util,HttpUtil,GsonUtils请从
@@ -19,15 +17,14 @@ object FaceDetect {
      * https://ai.baidu.com/file/470B3ACCA3FE43788B5A963BF0B625F3
      * 下载
      */
-    fun detect(imageStr: String): Observable<String> {
+    fun delete(groupId: String, userId: String): Observable<String> {
         return Observable.create {
             // 请求url
-            val url = "https://aip.baidubce.com/rest/2.0/face/v3/detect"
+            val url = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/face/delete"
             try {
                 val map: HashMap<String, String> = HashMap()
-                map.put("image", imageStr)
-                map.put("face_field", "age,beauty,expression,face_shape,gender,glasses,landmark,landmark150,race,quality,eye_status,emotion,face_type")
-                map.put("image_type", "BASE64")
+                map.put("user_id", userId)
+                map.put("group_id", groupId)
 
                 val param = GsonUtils.toJson(map)
 
@@ -35,13 +32,13 @@ object FaceDetect {
                 val accessToken = Constants.AIP_ACCESS_TOKEN
 
                 val result = HttpUtil.post(url, accessToken, "application/json", param)
-                LogUtils.eTag("FaceDetect", result)
+
+                LogUtils.eTag(Constants.TAG, result)
                 it.onNext(result)
             } catch (e: Exception) {
                 e.printStackTrace()
+                it.onNext(Constants.RX_ERROR)
             }
-
-            it.onNext( Constants.RX_ERROR)
         }
     }
 }

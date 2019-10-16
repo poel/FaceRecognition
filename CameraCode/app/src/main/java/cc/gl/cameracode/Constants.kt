@@ -7,7 +7,11 @@ object Constants {
 
     val RX_ERROR: String = "RX_ERROR"
 
+    val USER_NOT_FOUND: String = "USER_NOT_FOUND"
+
     var AIP_ACCESS_TOKEN: String? = null
 
     val TAG = "face_aip"
+
+    val SUCCESS_CODE: Int = 0
  }
